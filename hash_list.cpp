@@ -6,15 +6,101 @@ hash_list::hash_list() {}
  * START Part 1
  *------------------------------------------------------------------------------------*/
 
-void hash_list::insert(int key, float value) {}
+void hash_list::insert(int key, float value) {
+node* start = head;
+node* temp = nullptr;
 
-std::optional<float> hash_list::get_value(int key) const { return std::nullopt; }
+while(start != nullptr){
+	if(start->key == key){
+		start->value = value;
+		return;
+	}
+	temp = start;
+	start = start->next;
+}
 
-bool hash_list::remove(int key) { return false; }
+node* toAdd = new node(key, value);
 
-size_t hash_list::get_size() const { return 0; }
+if(head == nullptr){
+	head = toAdd;
+}
+else {
+	temp->next = toAdd;
+}
 
-hash_list::~hash_list() {}
+}
+
+std::optional<float> hash_list::get_value(int key) const { 
+	node* start = head;
+	node* temp = nullptr;
+
+	if(head == nullptr){
+		return std::nullopt;
+	}
+
+	while(start != nullptr){
+		if(start->key == key){
+			return start->value;
+		}
+		temp = start;
+		start = start->next;
+	}
+
+	return std::nullopt; 
+}
+
+bool hash_list::remove(int key) { 
+	if(head == nullptr){
+		return false;
+	}
+
+	node* start = head;
+	node* temp = nullptr;
+
+	while(start != nullptr){
+		if(start->key = key){
+			if(temp == nullptr){
+				head = start->next;
+			}
+			else{
+				temp->next = start->next;
+			}
+			delete start;
+			return true;
+		}
+
+		temp = start;
+		start = start->next;
+	}
+
+	return false; }
+
+size_t hash_list::get_size() const { 
+	if(head == nullptr){
+		return 0;
+	}
+
+	node* start = head;
+	node* temp = nullptr;
+	size_t count = 0;
+	while(start != nullptr){
+		count++;
+		temp = start;
+		start = start->next;
+	}
+
+	return count; }
+
+hash_list::~hash_list() {
+
+node* start = head;
+while(start != nullptr){
+	node* next = start->next;
+	delete start;
+	start = next;
+}
+
+}
 
 /**-----------------------------------------------------------------------------------
  * END Part 1
