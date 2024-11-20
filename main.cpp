@@ -1,81 +1,52 @@
 #include <iostream>
+#include <chrono>
+#include <optional>
+#include <vector>
 
-#include "hash_list.h"
+#include "poly.h"
 
-int trace_1();
-int trace_2();
-int trace_3();
-int trace_4();
-int trace_5();
+std::optional<double> poly_test(polynomial& p1,
+                                polynomial& p2,
+                                std::vector<std::pair<power, coeff>> solution)
 
-#ifdef PART2 // Only test iterators in part 2
-void iterator_example(hash_list &list)
 {
-    /** We have to reset the iterator before we use it */
-    list.reset_iter();
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-    /** We want to iterate over all nodes, so keep iterating until we're at the end */
-    while (!list.iter_at_end())
+    polynomial p3 = p1 * p2;
+
+    auto p3_can_form = p3.canonical_form();
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    p3.print();
+
+    if (p3_can_form != solution)
     {
-        /** Get pointers to key/value pairs */
-        std::optional<std::pair<const int *, float *>> node_values = list.get_iter_value();
-
-        /** Increment the VALUE. Note that the key remains unchanged */
-        (*node_values.value().second)++;
-
-        std::cout << "Key: " << *node_values.value().first
-                  << " and value: " << *node_values.value().second << std::endl;
-
-        /** Go to the next element */
-        list.increment_iter();
+        return std::nullopt;
     }
+
+    return std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
 }
-#endif
 
-int main(int argc, char *argv[])
+int main()
 {
+    /** We're doing (x+1)^2, so solution is x^2 + 2x + 1*/
+    std::vector<std::pair<power, coeff>> solution = {{2,1}, {1,2}, {0,1}};
 
-#ifdef PART1
-    hash_list list;
+    /** This holds (x+1), which we'll pass to each polynomial */
+    std::vector<std::pair<power, coeff>> poly_input = {{1,1}, {0,1}};
 
-    if (list.get_size() != 0)
+    polynomial p1(poly_input.begin(), poly_input.end());
+    polynomial p2(poly_input.begin(), poly_input.end());
+
+    std::optional<double> result = poly_test(p1, p2, solution);
+
+    if (result.has_value())
     {
-        std::cout << "Invalid size" << std::endl;
-        exit(1);
-    }
-
-    list.insert(3, 3);
-    list.insert(4, 4);
-    list.insert(5, 5);
-    list.insert(6, 6);
-
-    if (list.get_size() != 4)
+        std::cout << "Passed test, took " << result.value()/1000 << " seconds" << std::endl;
+    } 
+    else 
     {
-        std::cout << "Invalid size" << std::endl;
-        exit(1);
+        std::cout << "Failed test" << std::endl;
     }
-
-    if (!list.get_value(3).has_value())
-    {
-        std::cout << "expected 3 to be in list but it wasn't" << std::endl;
-        exit(1);
-    }
-
-    if (!list.remove(3))
-    {
-        std::cout << "Failed to remove 3 from list" << std::endl;
-        exit(1);
-    }
-
-    if (list.get_value(3).has_value())
-    {
-        std::cout << "Unexpected 3 in list" << std::endl;
-        exit(1);
-    }
-#endif
-
-#ifdef PART2
-    iterator_example(list);
-#endif
-
 }
