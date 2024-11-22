@@ -12,13 +12,11 @@ polynomial::polynomial(const polynomial &other)
 {
 	auto begin = other.p.begin();
 	p[0] = 0;
-	
+	degree = other.degree;
 	while(begin != other.p.end())
 	{
 		if(begin->second != 0)
 			p[begin->first] = begin->second;
-		if(begin->first > degree && begin->second != 0)
-			degree = begin->first;
 		begin++;
 	}
 }
@@ -53,14 +51,10 @@ void polynomial::print() const
 polynomial& polynomial::operator=(const polynomial& other)
 {
 	p.clear();
-	degree = 0;
 	for(auto pair: other.p)
-	{
 		p[pair.first] = pair.second;
-		if(pair.first > degree)
-			degree = pair.first;
-	}
 	
+	degree = other.degree;
 	return *this;
 }
 
@@ -106,6 +100,7 @@ polynomial polynomial::operator+(const polynomial& other) const
 		begin2++;
 	}
 
+	sum.degree = sum.find_degree_of();
 	return polynomial(sum);
 }
 
@@ -168,7 +163,13 @@ polynomial polynomial::operator%(const polynomial& other) const
 
 size_t polynomial::find_degree_of()
 {
-	return degree;
+	size_t _degree = 0;
+	for(auto pair:p)
+	{
+		if(pair.first > _degree && pair.second != 0)
+			_degree++;
+	}
+	return _degree;
 }
 
 
