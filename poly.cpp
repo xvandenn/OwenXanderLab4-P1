@@ -157,6 +157,7 @@ polynomial polynomial::operator%(const polynomial& other) const
 		r = (r + (t * other));
 		t.p.clear();
 	}
+	r.degree = r.find_degree_of();
 	return polynomial(r);
 }
 
