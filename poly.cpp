@@ -11,8 +11,7 @@ polynomial::polynomial()
 polynomial::polynomial(const polynomial &other)
 {
 	auto begin = other.p.begin();
-	if(begin == other.p.end())
-		p[0] = 0;
+	p[0] = 0;
 	
 	while(begin != other.p.end())
 	{
@@ -20,6 +19,7 @@ polynomial::polynomial(const polynomial &other)
 			p[begin->first] = begin->second;
 		begin++;
 	}
+	degree = other.degree;
 }
 
 
@@ -52,6 +52,7 @@ void polynomial::print() const
 polynomial& polynomial::operator=(const polynomial& other)
 {
 	p.clear();
+	degree = other.degree;
 	for(auto pair: other.p)
 		p[pair.first] = pair.second;
 	
@@ -59,11 +60,46 @@ polynomial& polynomial::operator=(const polynomial& other)
 }
 
 
-polynomial& polynomial::operator+(const polynomial& other)
+polynomial polynomial::operator+(const polynomial& other)
 {
-	return *this;
+	auto begin1 = p.begin();
+	auto end1 = p.end();
+
+	auto begin2 = other.p.begin();
+	auto end2 = other.p.end();
+
+	polynomial sum;
+	while(begin1 != end1 && begin2 != end2)
+	{
+		if(begin1->first == begin2->first && begin1->second != -begin2->second)
+		{
+			sum.p[begin1->first] = begin1->second + begin2->second;
+			begin1++;
+			begin2++;
+		}
+		else if(begin1->first > begin2->first)
+		{
+			sum.p[begin2->first] = begin2->second;
+			begin2++;
+		}
+		else
+		{
+			sum.p[begin1->first] = begin1->second;
+			begin1++;
+		}
+
+	}
+	return polynomial(sum);
 }
 
+
+polynomial polynomial::operator+(const int i) const
+{
+	const polynomial& ref = *this;
+	polynomial sum = polynomial(ref);
+	sum.p[0] += i;
+	return polynomial(sum);
+}
 
 polynomial& polynomial::operator*(const polynomial& other)
 {
@@ -79,7 +115,7 @@ polynomial& polynomial::operator%(const polynomial& other)
 
 size_t polynomial::find_degree_of()
 {
-	return 0;
+	return degree;
 }
 
 
@@ -93,6 +129,12 @@ std::vector<std::pair<power, coeff>> polynomial::canonical_form() const
 		canon.push_back(*iter);
 		iter--;
 	}
-	canon.push_back(*iter);
+	if(iter->second != 0 || canon.size() == 0)
+		canon.push_back(*iter);
 	return canon;
+}
+
+polynomial operator+(int i, const polynomial& other)
+{
+	return other + i;
 }

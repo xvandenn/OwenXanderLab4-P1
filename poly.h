@@ -14,6 +14,7 @@ class polynomial
 
 private:
     std::map<power, coeff>p;
+    size_t degree = 0;
 
 public:
     /**
@@ -35,14 +36,17 @@ public:
     template <typename Iter>
     polynomial(Iter begin, Iter end)
     {
-        //default to 0x^0 if itterator datastructure is empty
-	    if(begin == end)
 		p[0] = 0;
 
-	//add key-val = power-coefficent to map p and itterate begin
+	    //add key-val = power-coefficent to map p and itterate begin
 	    while(begin != end)
 	    {
-		    p[begin->first] = begin->second;
+            if(begin->second != 0)
+            {
+		        p[begin->first] = begin->second;
+                if(begin->first > degree)
+                    degree = begin->first;
+            }
 		    begin++;
 	    } 
     }
@@ -100,7 +104,8 @@ public:
      * @return
      * 
      */
-    polynomial &operator+(const polynomial& other);
+    polynomial operator+(const polynomial& other);
+    polynomial operator+(const int i) const;
 
 
     /**
@@ -149,5 +154,7 @@ public:
      */
     std::vector<std::pair<power, coeff>> canonical_form() const;
 };
+
+polynomial operator+(int i, const polynomial& other);
 
 #endif

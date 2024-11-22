@@ -19,6 +19,9 @@ std::optional<double> poly_test(polynomial& p1,
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
     p3.print();
+    (p1 + p2).print();
+    (10 + p2).print();
+    (p2 + 5).print();
 
     if (p3_can_form != solution)
     {
