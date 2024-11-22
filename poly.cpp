@@ -166,13 +166,13 @@ polynomial polynomial::operator%(const polynomial& other) const
 
 size_t polynomial::find_degree_of() const
 {
-	size_t _degree = 0;
-	for(auto pair:p)
+	auto itter = p.end();
+	itter--;
+	while(itter->second == 0 && itter != p.begin())
 	{
-		if(pair.first > _degree && pair.second != 0)
-			_degree = pair.first;
+		itter--;
 	}
-	return _degree;
+	return (size_t)itter->first;
 }
 
 
