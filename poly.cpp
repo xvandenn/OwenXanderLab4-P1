@@ -65,7 +65,7 @@ polynomial& polynomial::operator=(const polynomial& other)
 }
 
 
-polynomial polynomial::operator+(const polynomial& other)
+polynomial polynomial::operator+(const polynomial& other) const
 {
 	auto begin1 = p.begin();
 	auto end1 = p.end();
@@ -118,7 +118,7 @@ polynomial polynomial::operator+(const int i) const
 	return polynomial(sum);
 }
 
-polynomial polynomial::operator*(const polynomial& other)
+polynomial polynomial::operator*(const polynomial& other) const
 {
 	polynomial temp;
 	polynomial product;
@@ -146,7 +146,7 @@ polynomial polynomial::operator*(const int i) const
 }
 
 
-polynomial polynomial::operator%(const polynomial& other)
+polynomial polynomial::operator%(const polynomial& other) const
 {
 	if(other.degree == 0 && other.p.at(0) == 0)
 		return polynomial(*this);

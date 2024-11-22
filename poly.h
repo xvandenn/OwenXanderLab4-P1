@@ -104,7 +104,7 @@ public:
      * @return
      * 
      */
-    polynomial operator+(const polynomial& other);
+    polynomial operator+(const polynomial& other) const;
     polynomial operator+(const int i) const;
 
 
@@ -114,7 +114,7 @@ public:
      * @return
      * 
      */
-    polynomial operator*(const polynomial& other);
+    polynomial operator*(const polynomial& other) const;
     polynomial operator*(const int i) const;
 
     /**
@@ -123,7 +123,7 @@ public:
      * @return
      * 
      */
-    polynomial operator%(const polynomial& other);
+    polynomial operator%(const polynomial& other) const;
 
     /**
      * @brief Returns the degree of the polynomial
