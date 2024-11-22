@@ -12,7 +12,7 @@ polynomial::polynomial(const polynomial &other)
 {
 	auto begin = other.p.begin();
 	p[0] = 0;
-	degree = other.degree;
+	degree = other.find_degree_of();
 	while(begin != other.p.end())
 	{
 		if(begin->second != 0)
@@ -110,6 +110,7 @@ polynomial polynomial::operator+(const int i) const
 	const polynomial& ref = *this;
 	polynomial sum = polynomial(ref);
 	sum.p[0] += i;
+	sum.degree = sum.find_degree_of();
 	return polynomial(sum);
 }
 
@@ -129,6 +130,7 @@ polynomial polynomial::operator*(const polynomial& other) const
 		product = product + temp;
 		temp.p.clear();
 	}
+	product.degree = product.find_degree_of();
 	return polynomial(product);
 }
 
@@ -136,7 +138,7 @@ polynomial polynomial::operator*(const int i) const
 {
 	polynomial product;
 	product = product + i;
-	product = product * *this;
+	product = (product * *this);
 	return polynomial(product);
 }
 
@@ -162,13 +164,13 @@ polynomial polynomial::operator%(const polynomial& other) const
 }
 
 
-size_t polynomial::find_degree_of()
+size_t polynomial::find_degree_of() const
 {
 	size_t _degree = 0;
 	for(auto pair:p)
 	{
 		if(pair.first > _degree && pair.second != 0)
-			_degree++;
+			_degree = pair.first;
 	}
 	return _degree;
 }
