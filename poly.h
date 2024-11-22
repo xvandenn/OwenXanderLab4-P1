@@ -4,12 +4,16 @@
 #include <vector>
 #include <utility>
 #include <cstddef>
+#include <map>
 
 using power = size_t;
 using coeff = int;
 
 class polynomial
 {
+
+private:
+    std::map<power, coeff>p;
 
 public:
     /**
@@ -29,7 +33,19 @@ public:
      *  The end of the container to copy elements from
      */
     template <typename Iter>
-    polynomial(Iter begin, Iter end);
+    polynomial(Iter begin, Iter end)
+    {
+        //default to 0x^0 if itterator datastructure is empty
+	    if(begin == end)
+		p[0] = 0;
+
+	//add key-val = power-coefficent to map p and itterate begin
+	    while(begin != end)
+	    {
+		    p[begin->first] = begin->second;
+		    begin++;
+	    } 
+    }
 
     /**
      * @brief Construct a new polynomial object from an existing polynomial object
@@ -77,6 +93,31 @@ public:
      * 1. polynomial % polynomial
      */
     
+
+    /**
+     * @brief 
+     * 
+     * @return
+     * 
+     */
+    polynomial &operator+(const polynomial& other);
+
+
+    /**
+     * @brief
+     * 
+     * @return
+     * 
+     */
+    polynomial &operator*(const polynomial& other);
+
+    /**
+     * @brief
+     * 
+     * @return
+     * 
+     */
+    polynomial &operator%(const polynomial& other);
 
     /**
      * @brief Returns the degree of the polynomial

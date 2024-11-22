@@ -1,58 +1,62 @@
 #include "poly.h"
 
-polynomial::polynomial(){
-canonical_form.pushback({0,0});
+
+polynomial::polynomial()
+{
+	p[0] = 0;
 }
 
-template <typename Iter>
-polynomial(Iter begin, Iter end){
-	canonical_form.assign(begin, end);
-}
 
-polynomial(const polynomial &other){
-	canonical_form = other.canonical_form;
-}
-
-void print() const {
-
-	for(auto& term: canonical_form()){
-		power pw = term.first();
-		coeff co = term.second();
-
-		if(co == 0){
-			continue;
-		}
-
-		if(co > 0){
-			std::cout << " + " << co;
-		}
-		else{
-			std::cout << " - " << (-1 * co);
-		}
-
-		if(pw > 0){
-			std::cout << "x";
-			if(pw > 1){
-				std::cout << "^" << pw;
-			}
-		}
-
+polynomial::polynomial(const polynomial &other)
+{
+	auto begin = other.p.begin();
+	if(begin == other.p.end())
+		p[0] = 0;
+	
+	while(begin != other.p.end())
+	{
+		p[begin->first] = begin->second;
+		begin++;
 	}
-
 }
 
-polynomial &operator=(const polynomial &other){
-if(this != &other){
-	canonical_form = other.canonical_form;
-}
-return *this;
+
+void polynomial::print() const
+{}
+
+
+polynomial& polynomial::operator=(const polynomial& other)
+{
+	return *this;
 }
 
-size_t find_degree_of(){
-if(canonical_form.empty()){
+
+polynomial& polynomial::operator+(const polynomial& other)
+{
+	return *this;
+}
+
+
+polynomial& polynomial::operator*(const polynomial& other)
+{
+	return *this;
+}
+
+
+polynomial& polynomial::operator%(const polynomial& other)
+{
+	return *this;
+}
+
+
+size_t polynomial::find_degree_of()
+{
 	return 0;
 }
-return canonical_form.front().first;
+
+
+std::vector<std::pair<power, coeff>> polynomial::canonical_form() const
+{
+	std::vector<std::pair<power, coeff>> canon;
+	return canon;
 }
-
-
