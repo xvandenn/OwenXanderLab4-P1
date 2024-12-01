@@ -1,10 +1,13 @@
 #ifndef POLY_H
 #define POLY_H
 
+#include <thread>
 #include <vector>
 #include <utility>
 #include <cstddef>
 #include <map>
+#include <iostream>
+
 
 using power = size_t;
 using coeff = int;
@@ -154,9 +157,13 @@ public:
      *  A vector of pairs representing the canonical form of the polynomial
      */
     std::vector<std::pair<power, coeff>> canonical_form() const;
+    void copyRange(std::map<power, coeff>& data, std::map<power, coeff>::const_iterator& iter, int start, int end);
 };
 
 polynomial operator+(int i, const polynomial& other);
 polynomial operator*(int i, const polynomial& other);
+
+
+
 
 #endif

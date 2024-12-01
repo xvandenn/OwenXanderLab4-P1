@@ -1,5 +1,7 @@
 #include "poly.h"
-#include <iostream>
+#include <thread>
+
+using namespace std;
 
 
 polynomial::polynomial()
@@ -10,15 +12,34 @@ polynomial::polynomial()
 
 polynomial::polynomial(const polynomial &other)
 {
-	auto begin = other.p.begin();
-	p[0] = 0;
-	degree = other.find_degree_of();
-	while(begin != other.p.end())
-	{
-		if(begin->second != 0)
-			p[begin->first] = begin->second;
-		begin++;
+
+	// Threads
+
+	int length = other.p.size();
+	int cSize = length / 4;
+
+	auto iter = other.p.begin();
+
+	thread ft(&polynomial::copyRange, this, std::cref(other.p), std::ref(iter), 0, cSize);
+	thread st(&polynomial::copyRange, this, std::cref(other.p), std::ref(iter), cSize, 2*cSize);
+	thread tt(&polynomial::copyRange, this, std::cref(other.p), std::ref(iter), 2*cSize, 3*cSize);
+	thread fft(&polynomial::copyRange, this, std::cref(other.p), std::ref(iter), 3*cSize, length);
+
+	ft.join();
+	st.join();
+	tt.join();
+	fft.join();
+
+}
+
+void polynomial::copyRange(std::map<power, coeff>& data, std::map<power, coeff>::const_iterator& iter, int start, int end){
+	int i = 0;
+	while(i < (end - start) && iter != data.end()){
+		data[iter->first] = iter->second;
+		iter++;
+		i++;
 	}
+
 }
 
 
