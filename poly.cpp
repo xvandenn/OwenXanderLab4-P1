@@ -6,18 +6,25 @@ using namespace std;
 
 polynomial::polynomial()
 {
-
+	p.push(std::pair<power, coeff>(0, 0));
 }
 
 
 polynomial::polynomial(const polynomial &other)
 {
+	p = std::priority_queue<std::pair<power, coeff>>(other.p);
 }
 
 
 void polynomial::print() const
 {
-	
+	std::priority_queue<std::pair<power, coeff>> temp(p);
+	while(!temp.empty())
+	{
+		std::cout<<temp.top().second<<"X^"<<temp.top().first<<" + ";
+		temp.pop();
+	}
+	std::cout<<std::endl;
 }
 
 
@@ -61,7 +68,7 @@ polynomial polynomial::operator%(const polynomial& other) const
 
 size_t polynomial::find_degree_of() const
 {
-	return p.front().first;
+	return p.top().first;
 }
 
 

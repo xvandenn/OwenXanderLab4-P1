@@ -5,7 +5,7 @@
 #include <vector>
 #include <utility>
 #include <cstddef>
-#include <list>
+#include <queue>
 #include <iostream>
 
 
@@ -16,7 +16,7 @@ class polynomial
 {
 
 private:
-    std::list<std::pair<coeff, power>> p;
+    std::priority_queue<std::pair<power, coeff>> p;
 
 public:
     /**
@@ -42,11 +42,8 @@ public:
 	    //add key-val = power-coefficent to map p and itterate begin
 	    while(begin != end)
 	    {
-            if(begin->second != 0)
-            {
-                
-            }
-		    begin++;
+            p.push(*begin);
+            begin++;
 	    } 
     }
 
