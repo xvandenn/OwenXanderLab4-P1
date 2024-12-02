@@ -6,23 +6,23 @@ using namespace std;
 
 polynomial::polynomial()
 {
-	p.push(std::pair<power, coeff>(0, 0));
+	p.push_back(std::pair<power, coeff>(0, 0));
 }
 
 
 polynomial::polynomial(const polynomial &other)
 {
-	p = std::priority_queue<std::pair<power, coeff>>(other.p);
+	p = std::list<std::pair<power, coeff>>(other.p);
 }
 
 
 void polynomial::print() const
 {
-	std::priority_queue<std::pair<power, coeff>> temp(p);
-	while(!temp.empty())
+	auto iter = p.begin();
+	while(iter != p.end())
 	{
-		std::cout<<temp.top().second<<"X^"<<temp.top().first<<" + ";
-		temp.pop();
+		std::cout<<iter->second<<"X^"<<iter->first<<" + ";
+		iter++;
 	}
 	std::cout<<std::endl;
 }
@@ -30,6 +30,7 @@ void polynomial::print() const
 
 polynomial& polynomial::operator=(const polynomial& other)
 {
+	p = std::list<std::pair<power, coeff>>(other.p);
 	return *this;
 }
 
@@ -68,13 +69,20 @@ polynomial polynomial::operator%(const polynomial& other) const
 
 size_t polynomial::find_degree_of() const
 {
-	return p.top().first;
+	return p.begin()->first;
 }
 
 
 std::vector<std::pair<power, coeff>> polynomial::canonical_form() const
 {
-	return std::vector<std::pair<power,coeff>>();
+	std::vector<std::pair<power,coeff>> canon;
+	auto iter = p.begin();
+	while (iter != p.end())
+	{
+		canon.push_back(*iter);
+		iter++;
+	}
+	return canon;
 }
 
 polynomial operator+(int i, const polynomial& other)
