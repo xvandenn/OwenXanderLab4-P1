@@ -5,7 +5,7 @@
 #include <vector>
 #include <utility>
 #include <cstddef>
-#include <map>
+#include <list>
 #include <iostream>
 
 
@@ -16,8 +16,7 @@ class polynomial
 {
 
 private:
-    std::map<power, coeff>p;
-    size_t degree = 0;
+    std::list<std::pair<coeff, power>> p;
 
 public:
     /**
@@ -39,16 +38,13 @@ public:
     template <typename Iter>
     polynomial(Iter begin, Iter end)
     {
-		p[0] = 0;
 
 	    //add key-val = power-coefficent to map p and itterate begin
 	    while(begin != end)
 	    {
             if(begin->second != 0)
             {
-		        p[begin->first] = begin->second;
-                if(begin->first > degree)
-                    degree = begin->first;
+                
             }
 		    begin++;
 	    } 
