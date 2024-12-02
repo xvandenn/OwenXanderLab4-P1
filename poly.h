@@ -26,6 +26,11 @@ public:
     polynomial();
 
     /**
+     * @brief construct new polynomial object from polynomial list
+     */
+    polynomial(std::list<std::pair<power, coeff>> _p);
+
+    /**
      * @brief Construct a new polynomial object from an iterator to pairs of <power,coeff>
      *
      * @tparam Iter
@@ -66,6 +71,19 @@ public:
      *
      */
     void print() const;
+
+    /**
+     * @brief pushes term to back of list
+     * 
+     * @param term
+     * pair to be pushed to back of list
+     */
+    void insertPair(std::pair<power, coeff> term);
+
+    /**
+     * @brief pop first element from list
+     */
+    void pop();
 
     /**
      * @brief Turn the current polynomial instance into a deep copy of another
