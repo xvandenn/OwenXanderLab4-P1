@@ -1,5 +1,7 @@
 #include "poly.h"
 #include <thread>
+#include <vector>
+#include <mutex>
 
 using namespace std;
 
@@ -109,25 +111,35 @@ polynomial polynomial::operator*(const int i)const
 
 polynomial polynomial::operator*(const polynomial& other) const
 {
-	auto iter = p.begin();
-
+	std::vector<std::thread> threads;
 	polynomial product;
+	std::mutex mutex;
 	product.pop();
-	auto temp(other);
 
-	while(iter != p.end())
+	//testing out lambda
+	auto mux = [&/*using ref instead of copy this time*/](const std::pair<size_t, int>& multiplicand)
 	{
-		temp = other;
-		auto tempIter = temp.p.begin();
-		while(tempIter != temp.p.end())
+		polynomial temp(other);
+		for(auto& term: temp.p)
 		{
-			tempIter->first = tempIter->first + iter->first;
-			tempIter->second = tempIter->second * iter->second;
-			tempIter++;
+			term.first += multiplicand.first;
+			term.second *= multiplicand.second;
 		}
-		product = (temp + product);
-		iter++;
+		mutex.lock();
+		product = product + temp;
+		mutex.unlock();
+	};
+
+	for(const auto& multiplicand : p)
+	{
+		threads.emplace_back(mux, multiplicand);
 	}
+
+	for(auto& thread: threads)
+	{
+		thread.join();
+	}
+
 	return product;
 }
 
