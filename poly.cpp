@@ -14,10 +14,10 @@ polynomial::polynomial()
 
 polynomial::polynomial(const polynomial &other)
 {
-	p = std::vector<std::pair<power, coeff>>(other.p);
+	p = std::list<std::pair<power, coeff>>(other.p);
 }
 
-polynomial::polynomial(std::vector<std::pair<power, coeff>> _p)
+polynomial::polynomial(std::list<std::pair<power, coeff>> _p)
 {
 	p = _p;
 }
@@ -40,12 +40,12 @@ void polynomial::insertPair(std::pair<power, coeff> term)
 
 void polynomial::pop()
 {
-	return;
+	p.pop_front();
 }
 
 polynomial& polynomial::operator=(const polynomial& other)
 {
-	p = std::vector<std::pair<power, coeff>>(other.p);
+	p = std::list<std::pair<power, coeff>>(other.p);
 	return *this;
 }
 
@@ -55,7 +55,7 @@ polynomial polynomial::operator+(const int i) const
 	if(p.front().first == 0)
 		sum.p.front().second += i;
 	
-	else(sum.p.emplace(p.begin(), 0, i));
+	else(sum.p.push_front(std::pair<power, coeff>(0,i)));
 
 	return sum;
 }
@@ -116,47 +116,23 @@ polynomial polynomial::operator*(const polynomial& other) const
 	std::mutex mutex;
 	product.pop();
 
-	auto iter = p.begin();
-	int threadSize = 1;
-
 	//testing out lambda
-	auto mux = [&/*using ref instead of copy this time*/](auto start, auto end)
+	auto mux = [&/*using ref instead of copy this time*/](const std::pair<size_t, int>& multiplicand)
 	{
-		//trying with product local to thread so more computation is done before mutex is locked
-		polynomial threadProduct;
-		threadProduct.pop();
-
-		auto tempIter = start;
-		while(tempIter != end)
+		polynomial temp(other);
+		for(auto& term: temp.p)
 		{
-			polynomial temp(other);
-			for(auto term: temp.p)
-			{
-				term.first += tempIter->first;
-				term.second *= tempIter->second;
-			}
-			threadProduct = threadProduct + temp;
-			tempIter++;
+			term.first += multiplicand.first;
+			term.second *= multiplicand.second;
 		}
-
 		mutex.lock();
-		product = product + threadProduct;
+		product = product + temp;
 		mutex.unlock();
 	};
 
-	for(int i = 0; i < (int)p.size(); i++)
+	for(const auto& multiplicand : p)
 	{
-		auto start = iter;
-		int j = 0;
-		while(j < threadSize && iter != p.end())
-		{
-			iter++;
-			j++;
-		}
-		auto end = iter;
-		threads.emplace_back(mux, start, end);
-		if(iter == p.end())
-			break;
+		threads.emplace_back(mux, multiplicand);
 	}
 
 	for(auto& thread: threads)
@@ -176,7 +152,7 @@ polynomial polynomial::operator%(const polynomial& other) const
 	polynomial t;
 	t.pop();
 
-	while((r.p.back().second != 0) && r.p.back().first >= other.p.back().first)
+	while((r.p.back().second != 0 || r.p.back().first != 0) && r.p.back().first >= other.p.back().first)
 	{
 		t.insertPair(std::pair<power, coeff>(r.p.back().first - other.p.back().first, -1 * (r.p.back().second / other.p.back().second)));
 		r = (r + (t * other));
