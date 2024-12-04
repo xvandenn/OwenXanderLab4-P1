@@ -54,6 +54,7 @@ public:
         if(p.empty())
             p.push_back(std::pair<power, coeff>(0,0));
         p.sort();
+        removeLeadingZeros();
     }
 
     /**
@@ -71,6 +72,14 @@ public:
      *
      */
     void print() const;
+
+    void removeLeadingZeros()
+    {
+        while(p.back().second == 0 && p.size() > 1)
+        {
+            p.pop_back();
+        }
+    }
 
     /**
      * @brief pushes term to back of list

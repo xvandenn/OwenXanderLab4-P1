@@ -117,7 +117,7 @@ polynomial polynomial::operator*(const polynomial& other) const
 	product.pop();
 
 	auto iter = p.begin();
-	int threadSize = (p.size() + 4999) / 5000;
+	int threadSize = (p.size() + 999) / 1000;
 
 	//testing out lambda
 	auto mux = [&/*using ref instead of copy this time*/](auto start, auto end)
@@ -144,7 +144,7 @@ polynomial polynomial::operator*(const polynomial& other) const
 		mutex.unlock();
 	};
 
-	for(int i = 0; i < 5000; i++)
+	for(int i = 0; i < 1000; i++)
 	{
 		auto start = iter;
 		int j = 0;
