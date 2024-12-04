@@ -116,23 +116,47 @@ polynomial polynomial::operator*(const polynomial& other) const
 	std::mutex mutex;
 	product.pop();
 
+	auto iter = p.begin();
+	int threadSize = (p.size() + 4999) / 5000;
+
 	//testing out lambda
-	auto mux = [&/*using ref instead of copy this time*/](const std::pair<size_t, int>& multiplicand)
+	auto mux = [&/*using ref instead of copy this time*/](auto start, auto end)
 	{
-		polynomial temp(other);
-		for(auto& term: temp.p)
+		//trying with product local to thread so more computation is done before mutex is locked
+		polynomial threadProduct;
+		threadProduct.pop();
+
+		auto tempIter = start;
+		while(tempIter != end)
 		{
-			term.first += multiplicand.first;
-			term.second *= multiplicand.second;
+			polynomial temp(other);
+			for(auto term: temp.p)
+			{
+				term.first += tempIter->first;
+				term.second *= tempIter->second;
+			}
+			threadProduct = threadProduct + temp;
+			tempIter++;
 		}
+
 		mutex.lock();
-		product = product + temp;
+		product = product + threadProduct;
 		mutex.unlock();
 	};
 
-	for(const auto& multiplicand : p)
+	for(int i = 0; i < 5000; i++)
 	{
-		threads.emplace_back(mux, multiplicand);
+		auto start = iter;
+		int j = 0;
+		while(j < threadSize && iter != p.end())
+		{
+			iter++;
+			j++;
+		}
+		auto end = iter;
+		threads.emplace_back(mux, start, end);
+		if(iter == p.end())
+			break;
 	}
 
 	for(auto& thread: threads)
