@@ -175,12 +175,11 @@ std::vector<std::pair<power, coeff>> polynomial::canonical_form() const
 	while (iter != p.begin())
 	{
 		iter--;
-		canon.push_back(*iter);
+		if(iter->second != 0)
+			canon.push_back(*iter);
 	}
-	if(canon.back().second == 0)
-		canon.pop_back();
 	if(canon.size() == 0)
-		canon.push_back(std::pair<power, coeff>(0,0));
+		canon.emplace_back(0,0);
 	return canon;
 }
 
