@@ -164,10 +164,12 @@ polynomial polynomial::operator%(const polynomial& other) const
 
 size_t polynomial::find_degree_of() const
 {
-	for(auto term: p)
+	auto iter = p.end();
+	while(iter != p.begin())
 	{
-		if(term.second != 0)
-			return term.first;
+		iter--;
+		if(iter->second != 0)
+			return iter->first;
 	}
 	return 0;
 }
