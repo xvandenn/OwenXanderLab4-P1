@@ -176,7 +176,7 @@ polynomial polynomial::operator%(const polynomial& other) const
 	polynomial t;
 	t.pop();
 
-	while((r.p.back().second != 0 || r.p.back().first != 0) && r.p.back().first >= other.p.back().first)
+	while((r.p.back().second != 0) && r.p.back().first >= other.p.back().first)
 	{
 		t.insertPair(std::pair<power, coeff>(r.p.back().first - other.p.back().first, -1 * (r.p.back().second / other.p.back().second)));
 		r = (r + (t * other));
