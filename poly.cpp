@@ -126,7 +126,7 @@ polynomial polynomial::operator*(const polynomial& other) const
 			term.second *= multiplicand.second;
 		}
 		mutex.lock();
-		product.insertPair(std::pair<power, coeff>(0,0));
+		product = product + temp;
 		mutex.unlock();
 	};
 
