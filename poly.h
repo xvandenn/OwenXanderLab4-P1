@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <list>
 #include <iostream>
+#include <algorithm>
 
 
 using power = size_t;
@@ -16,7 +17,7 @@ class polynomial
 {
 
 private:
-    std::list<std::pair<power, coeff>> p;
+    std::vector<std::pair<power, coeff>> p;
 
 public:
     /**
@@ -28,7 +29,7 @@ public:
     /**
      * @brief construct new polynomial object from polynomial list
      */
-    polynomial(std::list<std::pair<power, coeff>> _p);
+    polynomial(std::vector<std::pair<power, coeff>> _p);
 
     /**
      * @brief Construct a new polynomial object from an iterator to pairs of <power,coeff>
@@ -53,7 +54,7 @@ public:
 	    }
         if(p.empty())
             p.push_back(std::pair<power, coeff>(0,0));
-        p.sort();
+        std::sort(p.begin(), p.end());
         removeLeadingZeros();
     }
 

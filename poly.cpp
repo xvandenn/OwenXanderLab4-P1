@@ -14,10 +14,10 @@ polynomial::polynomial()
 
 polynomial::polynomial(const polynomial &other)
 {
-	p = std::list<std::pair<power, coeff>>(other.p);
+	p = std::vector<std::pair<power, coeff>>(other.p);
 }
 
-polynomial::polynomial(std::list<std::pair<power, coeff>> _p)
+polynomial::polynomial(std::vector<std::pair<power, coeff>> _p)
 {
 	p = _p;
 }
@@ -40,12 +40,12 @@ void polynomial::insertPair(std::pair<power, coeff> term)
 
 void polynomial::pop()
 {
-	p.pop_front();
+	return;
 }
 
 polynomial& polynomial::operator=(const polynomial& other)
 {
-	p = std::list<std::pair<power, coeff>>(other.p);
+	p = std::vector<std::pair<power, coeff>>(other.p);
 	return *this;
 }
 
@@ -55,7 +55,7 @@ polynomial polynomial::operator+(const int i) const
 	if(p.front().first == 0)
 		sum.p.front().second += i;
 	
-	else(sum.p.push_front(std::pair<power, coeff>(0,i)));
+	else(sum.p.emplace(p.begin(), 0, i));
 
 	return sum;
 }
@@ -117,7 +117,7 @@ polynomial polynomial::operator*(const polynomial& other) const
 	product.pop();
 
 	auto iter = p.begin();
-	int threadSize = (p.size() + 7) / 8;
+	int threadSize = (p.size() + 999) / 1000;
 
 	//testing out lambda
 	auto mux = [&/*using ref instead of copy this time*/](auto start, auto end)
@@ -144,7 +144,7 @@ polynomial polynomial::operator*(const polynomial& other) const
 		mutex.unlock();
 	};
 
-	for(int i = 0; i < 8; i++)
+	for(int i = 0; i < 1000; i++)
 	{
 		auto start = iter;
 		int j = 0;
