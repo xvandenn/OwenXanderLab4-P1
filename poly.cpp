@@ -113,7 +113,7 @@ polynomial polynomial::operator*(const int i)const
 polynomial polynomial::operator*(const polynomial& other) const
 {
 	std::vector<std::thread> threads;
-	int numThreads = 1000;
+	int numThreads = 8;
 	polynomial product;
 	std::mutex mutex;
 	product.p.clear();
