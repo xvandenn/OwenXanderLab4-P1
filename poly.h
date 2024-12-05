@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <unordered_map>
 #include <iostream>
+#include <algorithm>
 
 
 using power = size_t;
@@ -39,18 +40,19 @@ public:
     template <typename Iter>
     polynomial(Iter begin, Iter end)
     {
-		p[0] = 0;
-
+        std::vector<std::pair<power, coeff>> temp(begin, end);
+        std::sort(temp.begin(), temp.end());
+        auto iter = temp.begin();
 	    //add key-val = power-coefficent to map p and itterate begin
-	    while(begin != end)
+	    while(iter != temp.end())
 	    {
-            if(begin->second != 0)
+            if(iter->second != 0)
             {
-		        p[begin->first] = begin->second;
-                if(begin->first > degree)
-                    degree = begin->first;
+		        p[iter->first] = iter->second;
+                if(iter->first > degree)
+                    degree = iter->first;
             }
-		    begin++;
+		    iter++;
 	    } 
     }
 

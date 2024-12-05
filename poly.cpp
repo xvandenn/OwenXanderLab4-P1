@@ -37,44 +37,68 @@ polynomial& polynomial::operator=(const polynomial& other)
 	if(p.size() == 0)
 		p[0] = 0;
 	degree = other.degree;
+	return *this;
 }
 
 
 polynomial polynomial::operator+(const polynomial& other) const
 {
-	auto begin1 = p.begin();
-	auto end1 = p.end();
+	auto begin = other.p.begin();
+	auto end = other.p.end();
 
-	auto begin2 = other.p.begin();
-	auto end2 = other.p.end();
+	polynomial sum(*this);
 
-	polynomial sum;
-
-	while(begin1 != end1)
+	while(begin != end)
 	{
-		if(begin1->second != 0)
-			sum.p[begin1->first] = begin1->second;
-		begin1++;
+		if(sum.p.at(begin->first))
+		{
+			if(sum.p[begin->first] == -begin->second)
+				sum.p.erase(begin->first);
+			else
+				sum.p[begin->first] += begin->second;
+		}
+		else
+			sum.p[begin->first] = begin->second;
+		begin++;
 	}
+	if (other.degree > sum.degree)
+		sum.degree = other.degree;
 
-
-	return polynomial(sum);
+	if(sum.p.size() == 0 || sum.p[sum.degree] == 0)
+	{
+		sum.degree = 0;
+		for(auto iter:sum.p)
+		{
+			if(iter.first > sum.degree)
+				sum.degree = iter.first;
+		}
+	}
+	return sum;
 }
 
 
 polynomial polynomial::operator+(const int i) const
 {
-	const polynomial& ref = *this;
-	polynomial sum = polynomial(ref);
-	sum.p[0] += i;
-	sum.degree = sum.find_degree_of();
-	return polynomial(sum);
+	polynomial sum(*this);
+	if(sum.p[0])
+		sum.p[0] += i;
+	else
+		sum.p[0] = i;
+
+	return sum;
 }
 
 polynomial polynomial::operator*(const polynomial& other) const
 {
 	polynomial temp;
 	polynomial product;
+	std::vector<std::thread> threads;
+
+	auto mux = [&](auto start, auto end)
+	{
+		polynomial threadSum;
+		
+	};
 
 	for(auto p1:p)
 	{
@@ -123,28 +147,14 @@ polynomial polynomial::operator%(const polynomial& other) const
 
 size_t polynomial::find_degree_of() const
 {
-	auto itter = p.end();
-	itter--;
-	while(itter->second == 0 && itter != p.begin())
-	{
-		itter--;
-	}
-	return (size_t)itter->first;
+	return degree;
 }
 
 
 std::vector<std::pair<power, coeff>> polynomial::canonical_form() const
 {
-	std::vector<std::pair<power, coeff>> canon;
-	auto iter = p.end();
-	iter--;
-	while(iter != p.begin())
-	{
-		canon.push_back(*iter);
-		iter--;
-	}
-	if(iter->second != 0 || canon.size() == 0)
-		canon.push_back(*iter);
+	std::vector<std::pair<power, coeff>> canon(p.begin(), p.end());
+	std::sort(canon.begin(), canon.end());
 	return canon;
 }
 
