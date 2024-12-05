@@ -55,7 +55,6 @@ public:
         if(p.empty())
             p.push_back(std::pair<power, coeff>(0,0));
         std::sort(p.begin(), p.end());
-        removeLeadingZeros();
     }
 
     /**

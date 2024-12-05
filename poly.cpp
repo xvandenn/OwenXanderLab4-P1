@@ -66,19 +66,20 @@ polynomial polynomial::operator+(const polynomial& other) const
 	auto iter2 = other.p.begin();
 
 	polynomial sum;
-	sum.pop();
+	sum.p.clear();
 
 	while(iter1 != p.end() && iter2 != other.p.end())
 	{
-		if(iter1->first < iter2->first)
+		if(iter1->first < iter2->first && iter1->second != 0)
 			sum.insertPair(*(iter1++));
-		else if(iter2->first < iter1->first)
+		else if(iter2->first < iter1->first && iter2->second != 0)
 			sum.insertPair(*(iter2++));
 		else
 		{
-			sum.insertPair(std::pair<power,coeff>(iter1->first, iter1->second + iter2->second));
-			if(sum.p.back().second == 0 && sum.p.back().first != 0)
-				sum.p.pop_back();
+			if(iter1->second + iter2->second != 0)
+				sum.insertPair(std::pair<power,coeff>(iter1->first, iter1->second + iter2->second));
+			if(sum.p.size() == 0)
+				sum.p.emplace_back(0,0);
 			iter1++;
 			iter2++;
 		}
@@ -114,17 +115,17 @@ polynomial polynomial::operator*(const polynomial& other) const
 	std::vector<std::thread> threads;
 	polynomial product;
 	std::mutex mutex;
-	product.pop();
+	product.p.clear();
 
 	auto iter = p.begin();
-	int threadSize = 1;
+	int threadSize = (p.size() + 7) / 8;
 
 	//testing out lambda
 	auto mux = [&/*using ref instead of copy this time*/](auto start, auto end)
 	{
 		//trying with product local to thread so more computation is done before mutex is locked
 		polynomial threadProduct;
-		threadProduct.pop();
+		threadProduct.p.clear();
 
 		auto tempIter = start;
 		while(tempIter != end)
@@ -144,7 +145,7 @@ polynomial polynomial::operator*(const polynomial& other) const
 		mutex.unlock();
 	};
 
-	for(int i = 0; i < (int)p.size(); i++)
+	for(int i = 0; i < 8; i++)
 	{
 		auto start = iter;
 		int j = 0;
@@ -169,18 +170,19 @@ polynomial polynomial::operator*(const polynomial& other) const
 
 polynomial polynomial::operator%(const polynomial& other) const
 {
-	if(other.p.back().first == 0 && other.p.back().second == 0)
+
+	if(other.find_degree_of() == 0 && other.p.front().second == 0)
 		return polynomial(*this);
 	
 	polynomial r(*this);
 	polynomial t;
-	t.pop();
+	t.p.clear();
 
 	while((r.p.back().second != 0) && r.p.back().first >= other.p.back().first)
 	{
 		t.insertPair(std::pair<power, coeff>(r.p.back().first - other.p.back().first, -1 * (r.p.back().second / other.p.back().second)));
-		r = (r + (t * other));
-		t.pop();
+		r = (r + (other * t));
+		t.p.clear();
 	}
 	return r;
 }
