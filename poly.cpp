@@ -1,5 +1,6 @@
 #include "poly.h"
 #include <thread>
+#include <mutex>
 
 using namespace std;
 
@@ -50,7 +51,7 @@ polynomial polynomial::operator+(const polynomial& other) const
 
 	while(begin != end)
 	{
-		if(sum.p.at(begin->first))
+		if(sum.p.find(begin->first) != sum.p.end())
 		{
 			if(sum.p[begin->first] == -begin->second)
 				sum.p.erase(begin->first);
@@ -64,7 +65,7 @@ polynomial polynomial::operator+(const polynomial& other) const
 	if (other.degree > sum.degree)
 		sum.degree = other.degree;
 
-	if(sum.p.size() == 0 || sum.p[sum.degree] == 0)
+	if(sum.p.empty() || sum.p.find(sum.degree) == sum.p.end() || sum.p[sum.degree] == 0)
 	{
 		sum.degree = 0;
 		for(auto iter:sum.p)
@@ -90,29 +91,58 @@ polynomial polynomial::operator+(const int i) const
 
 polynomial polynomial::operator*(const polynomial& other) const
 {
-	polynomial temp;
-	polynomial product;
 	std::vector<std::thread> threads;
+	polynomial product;
+	std::mutex mutex;
 
-	auto mux = [&](auto start, auto end)
+	auto iter = p.begin();
+	int threadSize = (p.size() + 999) / 1000;
+
+	//testing out lambda
+	auto mux = [&/*using ref instead of copy this time*/](auto start, auto end)
 	{
-		polynomial threadSum;
-		
+		//trying with product local to thread so more computation is done before mutex is locked
+		polynomial threadProduct;
+
+		auto tempIter = start;
+		while(tempIter != end)
+		{
+			polynomial temp;
+			for(auto term: other.p)
+			{
+				temp.p[term.first + tempIter->first] = term.second * tempIter->second;
+			}
+			threadProduct = threadProduct + temp;
+			tempIter++;
+		}
+
+		mutex.lock();
+		product = product + threadProduct;
+		mutex.unlock();
 	};
 
-	for(auto p1:p)
+	for(int i = 0; i < 1000; i++)
 	{
-		for(auto p2:other.p)
+		auto start = iter;
+		int j = 0;
+		while(j < threadSize && iter != p.end())
 		{
-			temp.p[p1.first + p2.first] = p1.second * p2.second;
-			if(temp.degree < p1.first + p2.first)
-				temp.degree = p1.first + p2.first;
+			iter++;
+			j++;
 		}
-		product = product + temp;
-		temp.p.clear();
+		auto end = iter;
+		threads.emplace_back(mux, start, end);
+		if(iter == p.end())
+			break;
 	}
-	product.degree = product.find_degree_of();
-	return polynomial(product);
+
+	for(auto& thread: threads)
+	{
+		if(thread.joinable())
+			thread.join();
+	}
+
+	return product;
 }
 
 polynomial polynomial::operator*(const int i) const
