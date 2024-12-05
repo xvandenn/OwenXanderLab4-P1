@@ -12,54 +12,31 @@ polynomial::polynomial()
 
 polynomial::polynomial(const polynomial &other)
 {
-
-	auto begin = other.p.begin();
-	p[0] = 0;
-	degree = other.find_degree_of();
-	while(begin != other.p.end())
-	{
-		if(begin->second != 0)
-			p[begin->first] = begin->second;
-		begin++;
-	}
-
+	p = std::unordered_map(other.p);
+	if(p.size() == 0)
+		p[0] = 0;
+	degree = other.degree;
 }
 
 
 void polynomial::print() const
 {
-	auto iter = p.end();
-	iter--;
-
-	while(iter != p.begin())
+	auto iter = p.begin();
+	while(iter != p.end())
 	{
-		
 		if(iter->second != 0)
 			std::cout<<iter->second<<"X^"<<iter->first<<" + ";
-		iter--;
+		iter++;
 	}
-
-	if(iter->second != 0)
-	{
-		std::cout<<iter->second;
-		if(iter->first != 0)
-			std::cout<<"X^"<<iter->first;
-		std::cout<<std::endl;
-	}
-	else
-		std::cout<<"0"<<std::endl;
-
 }
 
 
 polynomial& polynomial::operator=(const polynomial& other)
 {
-	p.clear();
-	for(auto pair: other.p)
-		p[pair.first] = pair.second;
-	
+	p = std::unordered_map(other.p);
+	if(p.size() == 0)
+		p[0] = 0;
 	degree = other.degree;
-	return *this;
 }
 
 
@@ -72,39 +49,8 @@ polynomial polynomial::operator+(const polynomial& other) const
 	auto end2 = other.p.end();
 
 	polynomial sum;
-	while(begin1 != end1 && begin2 != end2)
-	{
-		if(begin1->first == begin2->first)
-		{
-			if(begin1->second != -begin2->second)
-				sum.p[begin1->first] = begin1->second + begin2->second;
-			begin1++;
-			begin2++;
-		}
-		else if(begin1->first > begin2->first)
-		{
-			sum.p[begin2->first] = begin2->second;
-			begin2++;
-		}
-		else
-		{
-			sum.p[begin1->first] = begin1->second;
-			begin1++;
-		}
-	}
 
-	while(begin1 != end1)
-	{
-		sum.p[begin1->first] = begin1->second;
-		begin1++;
-	}
-	while(begin2 != end2)
-	{
-		sum.p[begin2->first] = begin2->second;
-		begin2++;
-	}
-
-	sum.degree = sum.find_degree_of();
+	
 	return polynomial(sum);
 }
 

@@ -5,7 +5,7 @@
 #include <vector>
 #include <utility>
 #include <cstddef>
-#include <map>
+#include <unordered_map>
 #include <iostream>
 
 
@@ -16,7 +16,7 @@ class polynomial
 {
 
 private:
-    std::map<power, coeff>p;
+    std::unordered_map<power, coeff>p;
     size_t degree = 0;
 
 public:
