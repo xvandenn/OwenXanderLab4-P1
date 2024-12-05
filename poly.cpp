@@ -50,7 +50,14 @@ polynomial polynomial::operator+(const polynomial& other) const
 
 	polynomial sum;
 
-	
+	while(begin1 != end1)
+	{
+		if(begin1->second != 0)
+			sum.p[begin1->first] = begin1->second;
+		begin1++;
+	}
+
+
 	return polynomial(sum);
 }
 
