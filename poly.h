@@ -11,7 +11,6 @@
 #include <thread>
 #include <mutex>
 
-
 using power = size_t;
 using coeff = int;
 
@@ -19,7 +18,7 @@ class polynomial
 {
 private:
     std::unordered_map<power, coeff>p;
-    power degree = 0;
+    power degree;
     void updateDegree();
 public:
     /**
@@ -50,8 +49,6 @@ public:
             if(iter->second != 0)
             {
 		        p[iter->first] = iter->second;
-                if(iter->first > degree)
-                    degree = iter->first;
             }
 		    iter++;
 	    } 
@@ -126,7 +123,6 @@ public:
      polynomial operator*(const polynomial& other) const;
     polynomial operator*(int constant) const;
     friend polynomial operator*(int constant, const polynomial& poly);
-    polynomial multNoThread(const polynomial& a, const polynomial& b) const;
 
     /**
      * @brief

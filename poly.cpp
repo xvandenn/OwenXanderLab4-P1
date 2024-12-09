@@ -91,16 +91,7 @@ polynomial operator+(int constant, const polynomial& other) {
     return other + constant;
 }
 
-// Multiplication operators
-polynomial polynomial::multNoThread(const polynomial& a, const polynomial& b) const {
-    polynomial product;
-    for (const auto& term1 : a.p) {
-        for (const auto& term2 : b.p) {
-            product.insertTerm(term1.first + term2.first, term1.second * term2.second);
-        }
-    }
-    return product;
-}
+
 
 polynomial polynomial::operator*(const polynomial& other) const {
     const int numThreads = 8; // Number of threads to use
@@ -191,7 +182,7 @@ polynomial polynomial::operator%(const polynomial& other) const {
         coeff coefDiff =  -1 * remainder.p[remainder.degree] / other.p.at(other.degree);
         polynomial temp;
         temp.insertTerm(degreeDiff, coefDiff);
-        remainder = remainder + multNoThread(other, temp);
+        remainder = remainder + other * temp;
     }
     return remainder;
 }
