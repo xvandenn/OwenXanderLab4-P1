@@ -147,10 +147,13 @@ polynomial polynomial::operator*(const polynomial& other) const
 
 polynomial polynomial::operator*(const int i) const
 {
-	polynomial product;
-	product = product + i;
-	product = (product * *this);
-	return polynomial(product);
+	polynomial product(*this);
+	for(auto term: product.p)
+	{
+		term.second *= i;
+	}
+
+	return product;
 }
 
 
@@ -183,8 +186,17 @@ size_t polynomial::find_degree_of() const
 
 std::vector<std::pair<power, coeff>> polynomial::canonical_form() const
 {
-	std::vector<std::pair<power, coeff>> canon(p.begin(), p.end());
-	std::sort(canon.begin(), canon.end());
+	std::vector<std::pair<power, coeff>> canon;
+
+	//transfer map to vector
+	for(const auto& term: p)
+	{
+		canon.push_back(term);
+	}
+
+	//use lambda to sort in descending order
+	std::sort(canon.begin(), canon.end(), [](const auto& a, const auto& b){return a.first > b.first;});
+
 	return canon;
 }
 
