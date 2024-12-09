@@ -132,7 +132,7 @@ polynomial polynomial::operator*(const polynomial& other) const
 		while(tempIter != end)
 		{
 			polynomial temp(other);
-			for(auto term: temp.p)
+			for(auto& term: temp.p)
 			{
 				term.first += tempIter->first;
 				term.second *= tempIter->second;
