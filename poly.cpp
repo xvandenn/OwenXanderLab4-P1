@@ -51,9 +51,13 @@ polynomial& polynomial::operator=(const polynomial& other)
 
 polynomial polynomial::operator+(const int i) const
 {
-	polynomial sum;
-	sum.p.front().second += i;
-	return (sum + *this);
+	polynomial sum(*this);
+	if(p.front().first == 0)
+		sum.p.front().second += i;
+	
+	else(sum.p.emplace(p.begin(), 0, i));
+
+	return sum;
 }
 
 polynomial polynomial::operator+(const polynomial& other) const
