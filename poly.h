@@ -44,7 +44,7 @@ public:
     template <typename Iter>
     polynomial(Iter begin, Iter end)
     {
-
+        p.emplace_back(0,0);
 	    //add key-val = power-coefficent to map p and itterate begin
 	    while(begin != end)
 	    {
