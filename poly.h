@@ -1,13 +1,15 @@
 #ifndef POLY_H
 #define POLY_H
 
-#include <thread>
-#include <vector>
-#include <utility>
-#include <cstddef>
 #include <unordered_map>
 #include <iostream>
+#include <cstddef>
+#include <utility>
+#include <vector>
 #include <algorithm>
+#include <stdexcept>
+#include <thread>
+#include <mutex>
 
 
 using power = size_t;
@@ -15,11 +17,10 @@ using coeff = int;
 
 class polynomial
 {
-
 private:
     std::unordered_map<power, coeff>p;
-    size_t degree = 0;
-
+    power degree = 0;
+    void updateDegree();
 public:
     /**
      * @brief Construct a new polynomial object that is the number 0 (ie. 0x^0)
@@ -72,6 +73,9 @@ public:
      */
     void print() const;
 
+    void insertTerm(power pow, coeff coef);
+    void simplify();
+
     /**
      * @brief Turn the current polynomial instance into a deep copy of another
      * polynomial
@@ -110,8 +114,8 @@ public:
      * 
      */
     polynomial operator+(const polynomial& other) const;
-    polynomial operator+(const int i) const;
-
+    polynomial operator+(int constant) const;
+    friend polynomial operator+(int constant, const polynomial& poly);
 
     /**
      * @brief
@@ -119,8 +123,10 @@ public:
      * @return
      * 
      */
-    polynomial operator*(const polynomial& other) const;
-    polynomial operator*(const int i) const;
+     polynomial operator*(const polynomial& other) const;
+    polynomial operator*(int constant) const;
+    friend polynomial operator*(int constant, const polynomial& poly);
+    polynomial multNoThread(const polynomial& a, const polynomial& b) const;
 
     /**
      * @brief
@@ -160,11 +166,5 @@ public:
      */
     std::vector<std::pair<power, coeff>> canonical_form() const;
 };
-
-polynomial operator+(int i, const polynomial& other);
-polynomial operator*(int i, const polynomial& other);
-
-
-
 
 #endif
