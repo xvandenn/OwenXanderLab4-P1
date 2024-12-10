@@ -55,7 +55,7 @@ polynomial polynomial::operator+(const int i) const
 	if(p.front().first == 0)
 		sum.p.front().second += i;
 	
-	else(sum.p.emplace(p.begin(), 0, i));
+	else(sum.p.insert(p.begin(), std::pair<power, coeff>(0,i)));
 
 	return sum;
 }
@@ -113,7 +113,8 @@ polynomial polynomial::operator*(const int i)const
 polynomial polynomial::operator*(const polynomial& other) const
 {
 	std::vector<std::thread> threads;
-	int numThreads = 16;
+	std::vector<polynomial> threadProducts;
+	int numThreads = 8;
 	polynomial product;
 	std::mutex mutex;
 	product.p.clear();
@@ -141,9 +142,7 @@ polynomial polynomial::operator*(const polynomial& other) const
 			tempIter++;
 		}
 
-		mutex.lock();
-		product = product + threadProduct;
-		mutex.unlock();
+		threadProducts.push_back(threadProduct);
 	};
 
 	for(int i = 0; i <  numThreads; i++)
@@ -166,6 +165,10 @@ polynomial polynomial::operator*(const polynomial& other) const
 		thread.join();
 	}
 
+	for(auto threadProduct: threadProducts)
+	{
+		product = product + threadProduct;
+	}
 	return product;
 }
 
