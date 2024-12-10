@@ -113,7 +113,7 @@ polynomial polynomial::operator*(const int i)const
 polynomial polynomial::operator*(const polynomial& other) const
 {
 	std::vector<std::thread> threads;
-	std::vector<polynomial> threadProducts;
+	std::vector<polynomial> threadProducts(8);
 	int numThreads = 8;
 	polynomial product;
 	std::mutex mutex;
@@ -123,10 +123,9 @@ polynomial polynomial::operator*(const polynomial& other) const
 	int threadSize = (p.size() + numThreads - 1) / numThreads;
 
 	//testing out lambda
-	auto mux = [&/*using ref instead of copy this time*/](auto start, auto end)
+	auto mux = [&/*using ref instead of copy this time*/](polynomial& threadProduct, auto start, auto end)
 	{
 		//trying with product local to thread so more computation is done before mutex is locked
-		polynomial threadProduct;
 		threadProduct.p.clear();
 
 		auto tempIter = start;
@@ -141,8 +140,6 @@ polynomial polynomial::operator*(const polynomial& other) const
 			threadProduct = threadProduct + temp;
 			tempIter++;
 		}
-
-		threadProducts.push_back(threadProduct);
 	};
 
 	for(int i = 0; i <  numThreads; i++)
@@ -155,7 +152,7 @@ polynomial polynomial::operator*(const polynomial& other) const
 			j++;
 		}
 		auto end = iter;
-		threads.emplace_back(mux, start, end);
+		threads.emplace_back(mux, std::ref(threadProducts[i]), start, end);
 		if(iter == p.end())
 			break;
 	}
@@ -174,15 +171,14 @@ polynomial polynomial::operator*(const polynomial& other) const
 
 polynomial polynomial::operator%(const polynomial& other) const
 {
-
-	if(other.find_degree_of() == 0 && other.p.front().second == 0)
+	if(other.p.back().first == 0 && other.p.front().second == 0)
 		return polynomial(*this);
 	
 	polynomial r(*this);
 	polynomial t;
 	t.p.clear();
 
-	while((r.p.back().second != 0) && r.p.back().first >= other.p.back().first)
+	while(!r.p.empty() && r.p.back().first >= other.p.back().first)
 	{
 		t.insertPair(std::pair<power, coeff>(r.p.back().first - other.p.back().first, -1 * (r.p.back().second / other.p.back().second)));
 		r = (r + (other * t));
