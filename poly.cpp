@@ -12,10 +12,10 @@ polynomial::polynomial()
 
 polynomial::polynomial(const polynomial &other)
 {
-	p = std::vector<std::pair<power, coeff>>(other.p);
+	p = std::list<std::pair<power, coeff>>(other.p);
 }
 
-polynomial::polynomial(std::vector<std::pair<power, coeff>> _p)
+polynomial::polynomial(std::list<std::pair<power, coeff>> _p)
 {
 	p = _p;
 }
@@ -38,23 +38,23 @@ void polynomial::insertPair(std::pair<power, coeff> term)
 
 void polynomial::pop()
 {
-	return;
+	return p.pop_front();
 }
 
 polynomial &polynomial::operator=(const polynomial &other)
 {
-	p = std::vector<std::pair<power, coeff>>(other.p);
+	if(other.p != p)
+		p = std::list<std::pair<power, coeff>>(other.p);
 	return *this;
 }
 
 polynomial polynomial::operator+(const int i) const
 {
 	polynomial sum(*this);
-	if (p.front().first == 0)
+	if(p.front().first == 0)
 		sum.p.front().second += i;
-
-	else
-		(sum.p.insert(p.begin(), std::pair<power, coeff>(0, i)));
+	
+	else(sum.p.push_front(std::pair<power, coeff>(0,i)));
 
 	return sum;
 }
@@ -65,26 +65,25 @@ polynomial polynomial::operator+(const polynomial &other) const
 	auto iter2 = other.p.begin();
 
 	polynomial sum;
-	sum.p.clear();
+	sum.pop();
 
-	while (iter1 != p.end() && iter2 != other.p.end())
+	while(iter1 != p.end() && iter2 != other.p.end())
 	{
-		if (iter1->first < iter2->first && iter1->second != 0)
+		if(iter1->first < iter2->first)
 			sum.insertPair(*(iter1++));
-		else if (iter2->first < iter1->first && iter2->second != 0)
+		else if(iter2->first < iter1->first)
 			sum.insertPair(*(iter2++));
 		else
 		{
-			if (iter1->second + iter2->second != 0)
-				sum.insertPair(std::pair<power, coeff>(iter1->first, iter1->second + iter2->second));
-			if (sum.p.size() == 0)
-				sum.p.emplace_back(0, 0);
+			sum.insertPair(std::pair<power,coeff>(iter1->first, iter1->second + iter2->second));
+			if(sum.p.back().second == 0 && sum.p.back().first != 0)
+				sum.p.pop_back();
 			iter1++;
 			iter2++;
 		}
 	}
 
-	if (iter1 == p.end())
+	if(iter1 == p.end())
 		sum.p.insert(sum.p.end(), iter2, other.p.end());
 	else
 		sum.p.insert(sum.p.end(), iter1, p.end());
@@ -149,7 +148,7 @@ polynomial polynomial::operator*(const polynomial &other) const
 		std::vector<polynomial> threadProducts(8);
 		int numThreads = 8;
 		std::mutex mutex;
-		product.p.clear();
+		product.pop();
 
 		auto iter = p.begin();
 		int threadSize = (p.size() + numThreads - 1) / numThreads;
@@ -158,7 +157,7 @@ polynomial polynomial::operator*(const polynomial &other) const
 		auto mux = [&/*using ref instead of copy this time*/](polynomial &threadProduct, auto start, auto end)
 		{
 			// trying with product local to thread so more computation is done before mutex is locked
-			threadProduct.p.clear();
+			threadProduct.pop();
 
 			auto tempIter = start;
 			while (tempIter != end)
@@ -209,13 +208,13 @@ polynomial polynomial::operator%(const polynomial &other) const
 
 	polynomial r(*this);
 	polynomial t;
-	t.p.clear();
+	t.pop();
 
-	while (!r.p.empty() && r.p.back().first >= other.p.back().first)
+	while (!r.p.empty() &&(r.p.back().second != 0 || r.p.back().first != 0) && r.p.back().first >= other.p.back().first)
 	{
 		t.insertPair(std::pair<power, coeff>(r.p.back().first - other.p.back().first, -1 * (r.p.back().second / other.p.back().second)));
 		r = (r + (other * t));
-		t.p.clear();
+		t.pop();
 	}
 	return r;
 }

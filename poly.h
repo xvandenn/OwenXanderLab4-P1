@@ -17,7 +17,7 @@ class polynomial
 {
 
 private:
-    std::vector<std::pair<power, coeff>> p;
+    std::list<std::pair<power, coeff>> p;
 
 public:
     /**
@@ -29,7 +29,7 @@ public:
     /**
      * @brief construct new polynomial object from polynomial list
      */
-    polynomial(std::vector<std::pair<power, coeff>> _p);
+    polynomial(std::list<std::pair<power, coeff>> _p);
 
     /**
      * @brief Construct a new polynomial object from an iterator to pairs of <power,coeff>
@@ -53,8 +53,8 @@ public:
             begin++;
 	    }
         if(p.empty())
-            p.push_back(std::pair<power, coeff>(0,0));
-        std::sort(p.begin(), p.end());
+            p.emplace_back(0,0);
+        p.sort();
     }
 
     /**
